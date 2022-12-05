@@ -30,6 +30,7 @@ func part1(r io.Reader) string {
 		pattern, _ = regexp.Compile(`move (\d+) from (\d+) to (\d+)`)
 	)
 
+	// Go through the instructions and re-arrange the crates.
 	for s.Scan() {
 		line := s.Text()
 
@@ -43,19 +44,67 @@ func part1(r io.Reader) string {
 		to, _ := strconv.Atoi(matches[3])
 
 		for i := 0; i < count; i++ {
+			// The crane can only move one box at a time.
 			state[to].Add(state[from].Remove(1)...)
 		}
 	}
 
+	// Take the topmost crate of each stack and build the result.
 	for i := range state {
 		crates := state[i].Remove(1)
-		if len(crates) > 0 {
-			result += crates[0]
+		if len(crates) == 0 {
+			// Skip any empty stacks
+			continue
 		}
+		result += crates[0]
 	}
 
 	return result
 }
+
+func part2(r io.Reader) string {
+	var result string
+
+	s := bufio.NewScanner(r)
+
+	// Read the starting state
+	state := readStartingState(s)
+
+	var (
+		pattern, _ = regexp.Compile(`move (\d+) from (\d+) to (\d+)`)
+	)
+
+	// Go through the instructions and re-arrange the crates.
+	for s.Scan() {
+		line := s.Text()
+
+		matches := pattern.FindStringSubmatch(line)
+		if matches == nil {
+			continue
+		}
+
+		count, _ := strconv.Atoi(matches[1])
+		from, _ := strconv.Atoi(matches[2])
+		to, _ := strconv.Atoi(matches[3])
+
+		// The crane can now move a whole bunch of crates in one go.
+		state[to].Add(state[from].Remove(count)...)
+	}
+
+	// Take the topmost crate of each stack and build the result.
+	for i := range state {
+		crates := state[i].Remove(1)
+		if len(crates) == 0 {
+			// Skip any empty stacks
+			continue
+		}
+		result += crates[0]
+	}
+
+	return result
+}
+
+// -------------------------------------
 
 func readStartingState(s *bufio.Scanner) []Stack {
 	var state []Stack
@@ -140,42 +189,5 @@ func chunkify(v string, chunkSize int) []string {
 		chunk := v[i:end]
 		result = append(result, chunk)
 	}
-	return result
-}
-
-func part2(r io.Reader) string {
-	var result string
-
-	s := bufio.NewScanner(r)
-
-	// Read the starting state
-	state := readStartingState(s)
-
-	var (
-		pattern, _ = regexp.Compile(`move (\d+) from (\d+) to (\d+)`)
-	)
-
-	for s.Scan() {
-		line := s.Text()
-
-		matches := pattern.FindStringSubmatch(line)
-		if matches == nil {
-			continue
-		}
-
-		count, _ := strconv.Atoi(matches[1])
-		from, _ := strconv.Atoi(matches[2])
-		to, _ := strconv.Atoi(matches[3])
-
-		state[to].Add(state[from].Remove(count)...)
-	}
-
-	for i := range state {
-		crates := state[i].Remove(1)
-		if len(crates) > 0 {
-			result += crates[0]
-		}
-	}
-
 	return result
 }
