@@ -27,3 +27,23 @@ func ReadAllLines(r io.Reader) []string {
 	}
 	return lines
 }
+
+type Stack[T any] []T
+
+func (s *Stack[T]) Push(t T) {
+	*s = append(*s, t)
+}
+
+func (s *Stack[T]) Pop() T {
+	t := (*s)[len(*s)-1]
+	*s = (*s)[:len(*s)-1]
+	return t
+}
+
+func (s *Stack[T]) Peek() T {
+	return (*s)[len(*s)-1]
+}
+
+type Point struct {
+	X, Y int
+}
