@@ -104,26 +104,6 @@ func part2(r io.Reader) int {
 	return sum
 }
 
-func printList(numbers []*listNode) {
-	var start *listNode
-	for _, n := range numbers {
-		if n.v == 0 {
-			start = n
-		}
-	}
-
-	for {
-		fmt.Printf("%d(%d)", start.v, start.shift)
-		if start.next.v == 0 {
-			break
-		}
-
-		fmt.Print("->")
-		start = start.next
-	}
-	fmt.Println()
-}
-
 func readNumbers(r io.Reader) []*listNode {
 	s := bufio.NewScanner(r)
 	var prev *listNode
